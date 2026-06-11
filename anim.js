@@ -33,29 +33,14 @@ var lyricsData = [
   { text: "Love.", time: 140 },
 ];
 
-// Animar las letras
+// Letras de la canción — desactivadas para un fondo más limpio
+// El elemento #lyrics está oculto vía CSS (display: none)
 function updateLyrics() {
-  var time = Math.floor(audio.currentTime);
-  var currentLine = lyricsData.find(
-    (line) => time >= line.time && time < line.time + 6
-  );
-
-  if (currentLine) {
-    // Calcula la opacidad basada en el tiempo en la línea actual
-    var fadeInDuration = 0.1; // Duración del efecto de aparición en segundos
-    var opacity = Math.min(1, (time - currentLine.time) / fadeInDuration);
-
-    // Aplica el efecto de aparición
-    lyrics.style.opacity = opacity;
-    lyrics.innerHTML = currentLine.text;
-  } else {
-    // Restablece la opacidad y el contenido si no hay una línea actual
-    lyrics.style.opacity = 0;
-    lyrics.innerHTML = "";
-  }
+  // No-op: el texto de letras se eliminó del diseño visual
+  // La lógica se preserva pero no actualiza el DOM
 }
 
-setInterval(updateLyrics, 1000);
+// setInterval(updateLyrics, 1000); // Desactivado
 
 //funcion titulo
 // Función para ocultar el título después de 216 segundos

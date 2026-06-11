@@ -1,0 +1,751 @@
+/* letter.css - Estilos para la Carta y el Sobre Romántico */
+/* Filosofía Emil Kowalski: animaciones físicas, curvas precisas, detalles invisibles */
+
+:root {
+  /* ─── Curvas de Easing Emil Kowalski ─── */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  /* UI entries: snappy, immediate */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  /* On-screen movement: natural arc */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* iOS drawer: heavy deceleration */
+  --ease-spring: cubic-bezier(0.34, 1.48, 0.64, 1);
+  /* Slight overshoot: alive feeling */
+
+  /* Dimensiones del sobre */
+  --envelope-w: 380px;
+  --envelope-h: 260px;
+
+  /* Colores del sobre (Temática romántica vintage) */
+  --bg-envelope-back: #ebd9d9;
+  --flap-side-color: #dfc5c5;
+  --flap-bottom-color: #d4b2b2;
+  --flap-top-color: #c89f9f;
+
+  /* Colores del papel */
+  --paper-bg: #fdfaf2;
+  --paper-lines: #c6e5f3;
+  --paper-margin: #ffb3b3;
+}
+
+@media (max-width: 480px) {
+  :root {
+    --envelope-w: 290px;
+    --envelope-h: 200px;
+  }
+
+  .letter-paper {
+    padding: 20px 10px 10px 30px;
+  }
+
+  .letter-overlay.reading .letter-paper {
+    height: 82vh;
+    padding: 28px 16px 28px 36px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .letter-content {
+    font-size: 1rem;
+    line-height: 28px; /* Mantener la alineación con las líneas del cuaderno */
+  }
+
+  .letter-content > p {
+    margin-bottom: 28px; /* Mantener ritmo vertical de 28px */
+  }
+
+  .letter-paper-header {
+    margin-bottom: 14px;
+  }
+
+  .letter-paper-footer {
+    margin-top: 20px;
+    padding-top: 10px;
+  }
+
+  .close-letter-btn {
+    margin-top: 14px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   BOTÓN TRIGGER — Centro inferior de pantalla
+   Estilo rectangular biselado 3D con sombras
+   ═══════════════════════════════════════════ */
+.letter-btn-container {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition:
+    transform 600ms var(--ease-out),
+    opacity 600ms var(--ease-out);
+  will-change: transform, opacity;
+}
+
+.letter-btn-container.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(24px);
+}
+
+/* Botón rectangular biselado estilo retro/3D */
+.letter-btn {
+  position: relative;
+  width: 190px;
+  height: 50px;
+  border-radius: 4px;
+  /* Gradiente principal: más claro arriba, más oscuro abajo → efecto luz */
+  background: linear-gradient(to bottom,
+      #ff6b9d 0%,
+      #e91e63 35%,
+      #c2185b 100%);
+  /* Bisel superior: línea de brillo */
+  border-top: 2px solid rgba(255, 255, 255, 0.45);
+  border-left: 2px solid rgba(255, 255, 255, 0.25);
+  border-right: 2px solid rgba(0, 0, 0, 0.15);
+  /* Bisel inferior: sombra de profundidad (la "muela" del botón) */
+  border-bottom: 5px solid #880e4f;
+  cursor: pointer;
+  /* Sombras: caída realista + glow rosado */
+  box-shadow:
+    0 8px 24px rgba(233, 30, 99, 0.45),
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  /* Transición: sólo transform y box-shadow → GPU compositing */
+  transition:
+    transform 160ms var(--ease-out),
+    box-shadow 160ms ease,
+    border-bottom-width 120ms ease;
+  /* Pulso suave para llamar la atención — raro/first-time, puede animar */
+  animation: buttonPulse 3s infinite ease-in-out;
+  will-change: transform;
+}
+
+/* Hover: sólo en dispositivos con cursor real */
+@media (hover: hover) and (pointer: fine) {
+  .letter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 14px 32px rgba(233, 30, 99, 0.55),
+      0 6px 12px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    animation-play-state: paused;
+  }
+}
+
+/* Active: presión física — el botón "baja" absorbiendo el bisel */
+.letter-btn:active {
+  transform: translateY(4px);
+  border-bottom-width: 1px;
+  box-shadow:
+    0 3px 10px rgba(233, 30, 99, 0.4),
+    0 1px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.15);
+  animation-play-state: paused;
+}
+
+.letter-btn svg {
+  fill: #fff;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+  /* Transición específica, no 'all' */
+  transition: transform 600ms var(--ease-out);
+  flex-shrink: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .letter-btn:hover svg {
+    transform: rotate(-12deg) scale(1.15);
+  }
+}
+
+/* Pulso suave: usa sólo opacity + scale (no layout triggers) */
+@keyframes buttonPulse {
+
+  0%,
+  100% {
+    box-shadow:
+      0 8px 24px rgba(233, 30, 99, 0.45),
+      0 4px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  50% {
+    box-shadow:
+      0 10px 32px rgba(233, 30, 99, 0.65),
+      0 5px 10px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MODAL OVERLAY
+   Entrada con ease-out (inmediata y responsiva)
+   Salida asimétrica más rápida
+   ═══════════════════════════════════════════ */
+.letter-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(8, 3, 6, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  /* Salida rápida asimétrica: 350ms */
+  transition: opacity 350ms var(--ease-out);
+}
+
+.letter-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+  /* Entrada: 600ms */
+  transition: opacity 600ms var(--ease-out);
+}
+
+/* ═══════════════════════════════════════════
+   SOBRE — Envelope Wrapper
+   Entrada: scale(0.95) + opacity 0 → no desde cero
+   Easing tipo drawer iOS
+   ═══════════════════════════════════════════ */
+.envelope-wrapper {
+  position: relative;
+  width: var(--envelope-w);
+  height: var(--envelope-h);
+  background-color: var(--bg-envelope-back);
+  border-radius: 6px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 8px 20px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  perspective: 1000px;
+  /* Estado inicial: sobre cae desde arriba — nada en la realidad aparece de la nada */
+  transform: scale(0.88) translateY(-28px);
+  opacity: 0;
+  transition:
+    transform 1125ms var(--ease-drawer),
+    opacity 750ms var(--ease-out),
+    background-color 450ms ease,
+    box-shadow 450ms ease;
+  will-change: transform, opacity;
+  z-index: 5;
+}
+
+.letter-overlay.active .envelope-wrapper {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Sacudida al abrir: sobre vibra ligeramente antes de revelar la carta */
+.envelope-wrapper.shaking {
+  animation: envelopeShake 630ms var(--ease-out);
+}
+
+@keyframes envelopeShake {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  18% {
+    transform: rotate(-1.8deg) scale(1.01);
+  }
+
+  36% {
+    transform: rotate(1.5deg) scale(1.015);
+  }
+
+  54% {
+    transform: rotate(-1deg) scale(1.01);
+  }
+
+  72% {
+    transform: rotate(0.6deg) scale(1.005);
+  }
+
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* Respuesta física al press — siempre responsivo */
+.envelope-wrapper:not(.open):active {
+  transform: scale(0.97);
+}
+
+/* ═══════════════════════════════════════════
+   SOLAPAS DEL SOBRE
+   ═══════════════════════════════════════════ */
+.envelope-flaps {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: visible;
+}
+
+.left-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: calc(var(--envelope-w) / 2) solid var(--flap-side-color);
+  border-top: calc(var(--envelope-h) / 2) solid transparent;
+  border-bottom: calc(var(--envelope-h) / 2) solid transparent;
+  z-index: 3;
+}
+
+.right-flap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-right: calc(var(--envelope-w) / 2) solid var(--flap-side-color);
+  border-top: calc(var(--envelope-h) / 2) solid transparent;
+  border-bottom: calc(var(--envelope-h) / 2) solid transparent;
+  z-index: 3;
+}
+
+.bottom-flap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-bottom: calc(var(--envelope-h) / 2 + 10px) solid var(--flap-bottom-color);
+  border-left: calc(var(--envelope-w) / 2) solid transparent;
+  border-right: calc(var(--envelope-w) / 2) solid transparent;
+  z-index: 4;
+}
+
+.left-flap, .right-flap, .bottom-flap {
+  transition: opacity 900ms ease;
+}
+
+.top-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-top: calc(var(--envelope-h) / 2 + 5px) solid var(--flap-top-color);
+  border-left: calc(var(--envelope-w) / 2) solid transparent;
+  border-right: calc(var(--envelope-w) / 2) solid transparent;
+  transform-origin: top center;
+  /* Apertura del sobre: ease-out para movimiento en pantalla rápido */
+  transition:
+    transform 500ms var(--ease-out),
+    opacity 500ms var(--ease-out);
+  z-index: 5;
+}
+
+/* ═══════════════════════════════════════════
+   SELLO DE LACRE
+   ═══════════════════════════════════════════ */
+.wax-seal {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  background: radial-gradient(circle at 35% 35%, #ef5350 0%, #b71c1c 55%, #7b1fa2 100%);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -20%);
+  z-index: 6;
+  box-shadow:
+    0 5px 14px rgba(0, 0, 0, 0.45),
+    inset 0 2px 5px rgba(255, 255, 255, 0.35),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Salida: asimétrica — sale rápido (300ms), sólo transición de lo que cambia */
+  transition:
+    transform 570ms var(--ease-out),
+    opacity 420ms ease;
+}
+
+/* El sello se agita justo antes de "romperse" — refuerza la causalidad física */
+.wax-seal.breaking {
+  animation: sealBreak 400ms var(--ease-out) forwards;
+}
+
+@keyframes sealBreak {
+  0% {
+    transform: translate(-50%, -20%) scale(1) rotate(0deg);
+  }
+
+  30% {
+    transform: translate(-50%, -20%) scale(1.18) rotate(-8deg);
+  }
+
+  60% {
+    transform: translate(-50%, -20%) scale(1.1) rotate(5deg);
+  }
+
+  100% {
+    transform: translate(-50%, -20%) scale(0.6) rotate(12deg);
+    opacity: 0;
+  }
+}
+
+.wax-seal::after {
+  content: '❤';
+  color: #ffcdd2;
+  font-size: 1.5rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  display: block;
+  animation: sealPulse 2s infinite ease-in-out;
+}
+
+@keyframes sealPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   PAPEL DE LA CARTA
+   Transición con ease-drawer para extracción natural
+   ═══════════════════════════════════════════ */
+.letter-paper {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  left: 5%;
+  top: 5%;
+  background-color: var(--paper-bg);
+  background-image: repeating-linear-gradient(var(--paper-bg) 0px,
+      var(--paper-bg) 27px,
+      var(--paper-lines) 27px,
+      var(--paper-lines) 28px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  z-index: 2;
+  padding: 30px 20px 20px 45px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  border-left: 2px solid var(--paper-margin);
+  /* Extracción: ease-spring para overshoot sutil — la carta cobra vida */
+  transition:
+    transform 900ms var(--ease-spring),
+    width 800ms var(--ease-drawer),
+    height 800ms var(--ease-drawer),
+    left 800ms var(--ease-drawer),
+    top 800ms var(--ease-drawer),
+    filter 400ms ease,
+    opacity 300ms ease;
+  opacity: 0;
+  will-change: transform, filter;
+}
+
+/* ═══════════════════════════════════════════
+   CONTENIDO DE LA CARTA
+   Stagger escalonado (30-80ms entre items)
+   ═══════════════════════════════════════════ */
+.letter-content {
+  font-family: 'Lora', serif;
+  font-size: 1.1rem;
+  line-height: 28px;
+  color: #2b1810;
+  text-align: left;
+}
+
+.letter-content > p {
+  margin-bottom: 28px;
+}
+
+/* Estado base: fuera de vista, listo para animar */
+.letter-content p,
+.letter-content .letter-paper-footer,
+.letter-content .close-btn-container {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 600ms var(--ease-out),
+    transform 600ms var(--ease-out);
+}
+
+/* Stagger: entrada escalonada 150ms entre párrafos — tiempo suficiente para leer */
+.letter-overlay.reading .letter-content p:nth-child(1) {
+  transition-delay: 800ms;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.letter-overlay.reading .letter-content p:nth-child(2) {
+  transition-delay: 950ms;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.letter-overlay.reading .letter-content p:nth-child(3) {
+  transition-delay: 1100ms;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.letter-overlay.reading .letter-content p:nth-child(4) {
+  transition-delay: 1250ms;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.letter-overlay.reading .letter-content p:nth-child(5) {
+  transition-delay: 1400ms;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.letter-overlay.reading .letter-content .letter-paper-footer {
+  transition-delay: 1550ms;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.letter-overlay.reading .letter-content .close-btn-container {
+  transition-delay: 1700ms;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════
+   ESTADOS DEL SOBRE ABIERTO
+   ═══════════════════════════════════════════ */
+.envelope-wrapper.open .top-flap {
+  transform: rotateX(180deg);
+  z-index: 1;
+  opacity: 0;
+}
+
+.envelope-wrapper.open .wax-seal {
+  transform: translate(-50%, -120%) scale(0.55);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Carta asomándose: translateY + leve rotateX para sensación de profundidad 3D */
+.envelope-wrapper.open .letter-paper {
+  opacity: 1;
+  transform: translateY(-48%) rotateX(-2deg);
+  z-index: 10;
+  transform-origin: bottom center;
+}
+
+/* ═══════════════════════════════════════════
+   MODO LECTURA — Carta expandida
+   ═══════════════════════════════════════════ */
+.letter-overlay.reading .envelope-wrapper {
+  pointer-events: none;
+  /* El sobre se desliza hacia abajo saliendo de la pantalla de forma fluida */
+  transform: translateY(100vh);
+  opacity: 1;
+  background-color: transparent;
+  box-shadow: none;
+  transition:
+    transform 800ms var(--ease-drawer),
+    background-color 600ms ease,
+    box-shadow 600ms ease;
+}
+
+.letter-overlay.reading .envelope-flaps div {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.letter-overlay.reading .letter-paper {
+  opacity: 1;
+  width: 92vw;
+  max-width: 480px;
+  height: 75vh;
+  left: 50%;
+  top: 50%;
+  /* Carta llega centrada con spring — ligero overshoot al asentarse.
+     Contrarrestamos la traslación de 100vh del padre para mantenerla centrada. */
+  transform: translate(-50%, -50%) translateY(-100vh) scale(1);
+  transform-origin: center bottom;
+  z-index: 2000;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.7),
+    0 8px 24px rgba(233, 30, 99, 0.2);
+  padding: 40px 30px 40px 50px;
+  cursor: default;
+  pointer-events: auto;
+  filter: none;
+}
+
+/* La carta brilla al expandirse — refuerza que algo especial está pasando */
+@keyframes paperReveal {
+  0% {
+    box-shadow: 0 4px 20px rgba(233, 30, 99, 0.0), 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  40% {
+    box-shadow: 0 8px 40px rgba(233, 30, 99, 0.3), 0 16px 48px rgba(0, 0, 0, 0.4);
+  }
+
+  100% {
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7), 0 8px 24px rgba(233, 30, 99, 0.2);
+  }
+}
+
+.letter-paper.is-reading {
+  animation: paperReveal 800ms var(--ease-out) forwards;
+}
+
+/* ═══════════════════════════════════════════
+   ENCABEZADO Y PIE DEL PAPEL
+   ═══════════════════════════════════════════ */
+.letter-paper-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px dashed #d7ccc8;
+  padding-bottom: 5px;
+}
+
+.letter-paper-date {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.75rem;
+  color: #8d6e63;
+  letter-spacing: 1px;
+}
+
+.letter-paper-heart {
+  color: #e53935;
+  font-size: 1.2rem;
+  animation: sealPulse 1.8s infinite ease-in-out;
+}
+
+.letter-paper-footer {
+  margin-top: 30px;
+  text-align: right;
+  border-top: 1px dashed #d7ccc8;
+  padding-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.letter-signature {
+  font-family: 'Dancing Script', cursive;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #c62828;
+  margin-top: 5px;
+}
+
+/* ═══════════════════════════════════════════
+   BOTÓN DE CIERRE
+   Entrada con spring (ligero overshoot)
+   Active con scale(0.96) — feedback inmediato
+   ═══════════════════════════════════════════ */
+.close-letter-btn {
+  margin-top: 25px;
+  padding: 10px 28px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow:
+    0 4px 14px rgba(198, 40, 40, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition:
+    transform 160ms var(--ease-out),
+    box-shadow 160ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .close-letter-btn:hover {
+    transform: scale(1.04);
+    box-shadow:
+      0 7px 20px rgba(198, 40, 40, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+}
+
+.close-letter-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(198, 40, 40, 0.35);
+}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════ */
+.letter-paper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.letter-paper::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.letter-paper::-webkit-scrollbar-thumb {
+  background: #d7ccc8;
+  border-radius: 4px;
+}
+
+.letter-paper::-webkit-scrollbar-thumb:hover {
+  background: #bcaaa4;
+}
+
+/* ═══════════════════════════════════════════
+   ACCESIBILIDAD — Movimiento reducido
+   Mantener opacidad (comprensión) pero sin
+   movimiento ni posición (salud)
+   ═══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+
+  .letter-overlay,
+  .envelope-wrapper,
+  .letter-paper,
+  .top-flap,
+  .wax-seal,
+  .letter-btn,
+  .close-letter-btn,
+  .letter-content p,
+  .letter-content .letter-paper-footer,
+  .letter-content .close-btn-container {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

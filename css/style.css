@@ -11,7 +11,13 @@ body{
     align-items: center;
     justify-content: center;
     background-color: black;
+    opacity: 1;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     /* padding-top: -30; */
+}
+
+body.fade-out {
+    opacity: 0;
 }
 
 .botones{
@@ -22,18 +28,24 @@ body{
 }
 
 .botones a{
-    background-color: #0a2be9;
+    background: linear-gradient(135deg, #ff4081, #ff1744);
+    box-shadow: 0 4px 15px rgba(255, 23, 68, 0.4);
     padding: 9px;
     border-radius: 80px;
     -webkit-border-radius: 80px;
     -moz-border-radius: 80px;
     -ms-border-radius: 80px;
     -o-border-radius: 80px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
+.botones a:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 23, 68, 0.6);
 }
 
 .botones a:focus{
-    background-color: rgb(50, 194, 194);
+    background-color: #d81b60;
 }
 
 .greetings{
@@ -46,7 +58,7 @@ body{
 @keyframes glow{
     0%, 100%{
         color: #fff;
-        text-shadow: 0 0 12px #39c6d6, 0 0 50px #39c6d6, 0 0 100px #39c6d6;
+        text-shadow: 0 0 12px #ff4081, 0 0 50px #ff4081, 0 0 100px #ff1744;
     }
     10%, 90%{
         color: #111;
@@ -88,7 +100,9 @@ body{
         text-align: center;
     }
     .description{
-        font-size: 2rem;
+        font-size: 1.2rem;
+        text-align: center;
+        padding: 0 15px;
     }
     
     .button a{
